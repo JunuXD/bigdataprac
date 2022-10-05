@@ -16,7 +16,7 @@ max_data = defaultdict(float)
 min_data = defaultdict(float)
 my_data = defaultdict(float)
 
-years = range(2013, 2023)
+years = [2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2022]
 
 
 #UI - Input TeamName -> graph
@@ -42,7 +42,7 @@ def check_name(name):
 
 #Draw Efficiency Graph
 def drawGraph():
-    xAxis = list(range(2013,2023))
+    xAxis = years
     myAxis = list(my_data.keys())
     
     highList = list(max_data.values())
@@ -106,7 +106,6 @@ for team, dictval in dataDef.items():
             totalpay += temp
 
         obj.append(totalpay)
-
 
 #Data Processing(Attack WAR + Defence WAR)
 for Def, Att in zip(dataDef.items(), dataAtt.items()):
