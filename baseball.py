@@ -113,14 +113,13 @@ for Def, Att in zip(dataDef.items(), dataAtt.items()):
     for d_info,a_info in zip(Def[1],Att[1]):
         dataTot[Def[0]].append([d_info[0], d_info[1]+a_info[1], d_info[2]])
 
-
-#Data Processing(Pay / Total WAR) and Store myTeamName Information
+#Data Processing(Total WAR / Pay) and Store myTeamName Information
 for team, year_arr in dataTot.items():
     if team == '키움': #키움 has no information about pay
         continue
     
     for year, war, price in year_arr:
-        eff = price / war
+        eff = war / price
 
         max_data[year] = max(max_data[year], eff)
         if min_data[year] == 0:
