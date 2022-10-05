@@ -8,22 +8,24 @@ baseUrlTeamDef = "http://www.statiz.co.kr/stat.php?opt=0&sopt=0&re=1&ys={}&ye={}
 baseUrlTeamAtt = "http://www.statiz.co.kr/stat.php?opt=0&sopt=0&re=0&ys={}&ye={}&se=0&te=&tm=&ty=0&qu=auto&po=0&as=&ae=&hi=&un=&pl=&da=1&o1=WAR_ALL_ADJ&o2=TPA&de=1&lr=5&tr=&cv=&ml=1&sn=30&si=&cn="
 baseUrlPay = "http://www.statiz.co.kr/team.php?cteam={}&year={}&opt=0&sopt=8"
 
-dataAtt = dict(LG = [], KIA = [], 해태 = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], OB = [], 롯데 = [], 한화 = [], 히어로즈 = [], 넥센 = [], 키움 = [], SK = [], 쌍방울 = [], MBC = [], 현대 = [])
-dataDef = dict(LG = [], KIA = [], 해태 = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], OB = [], 롯데 = [], 한화 = [], 히어로즈 = [], 넥센 = [], 키움 = [], SK = [], 쌍방울 = [], MBC = [], 현대 = [])
+dataAtt = dict(LG = [], KIA = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], 롯데 = [], 한화 = [], 넥센 = [], 키움 = [], SK = [])
+dataDef = dict(LG = [], KIA = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], 롯데 = [], 한화 = [], 넥센 = [], 키움 = [], SK = [])
+dataTot = dict(LG = [], KIA = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], 롯데 = [], 한화 = [], 넥센 = [], 키움 = [], SK = [])
 
 max_data = defaultdict(float)
 min_data = defaultdict(float)
 my_data = defaultdict(float)
 
-
-dataTot = dict(LG = [], KIA = [], 해태 = [], SSG = [], NC = [], 삼성 = [], KT = [], 두산 = [], OB = [], 롯데 = [], 한화 = [], 히어로즈 = [], 넥센 = [], 키움 = [], SK = [], 쌍방울 = [], MBC = [], 현대 = [])
-
 years = range(2013, 2023)
 
+
+#UI - Input TeamName -> graph
+print("Team Efficiency Information(LG, KIA, SSG, NC, 삼성, KT, 두산, 롯데, 한화, 넥센, SK)")
 print("Input Your favorite TeamName : ",end = "")
 my_team_name = input()
 
 
+# Change Team Name to English
 def check_name(name):
     if name == '한화':
         return 'HANHWA'
@@ -35,13 +37,11 @@ def check_name(name):
         return 'DOOSAN'
     elif name == '롯데':
         return 'LOTTE'
-    elif name == '히어로즈':
-        return 'HEROS'
     else:
         return name
-    
+
+#Draw Efficiency Graph
 def drawGraph():
-    years = range(2013,2023)
     xAxis = list(range(2013,2023))
     myAxis = list(my_data.keys())
     
@@ -50,9 +50,11 @@ def drawGraph():
     myList = list(my_data.values())
 
     name = check_name(my_team_name)
-    p.plot (xAxis, highList,    'r', label = 'high')
-    p.plot (xAxis, lowList,  'b', label = 'low')     
-    p.plot (myAxis, myList, 'g', label = name)    
+
+    p.xticks(range(2013,2023))
+    p.plot (xAxis, highList,    'ro-', label = 'high')
+    p.plot (xAxis, lowList,  'b^-', label = 'low')     
+    p.plot (myAxis, myList, 'gx-', label = name)    
     
     p.xlabel ('Year')
     p.ylabel ('Team Efficiency')
@@ -61,7 +63,7 @@ def drawGraph():
     p.show()
 
 
-#attack
+#Crawl Attack Information
 for year in years:
     req = Request(baseUrlTeamAtt.format(year, year))
     wp = urlopen(req)
@@ -74,7 +76,7 @@ for year in years:
         warvalue = tdList[3].find('span').get_text()
         dataAtt[teamname].append([year, float(warvalue)])
 
-#defence
+#Crawl Defense Information
 for year in years:
     req = Request(baseUrlTeamDef.format(year, year))
     wp = urlopen(req)
@@ -87,16 +89,14 @@ for year in years:
         warvalue = tdList[3].find('span').get_text()
         dataDef[teamname].append([year, float(warvalue)])
 
-
+#Crawl Pay Information
 for team, dictval in dataDef.items():
     for obj in dictval:
-        #print(baseUrlPay.format(team, obj[0]))
         year = obj[0]
         req = Request(baseUrlPay.format(urllib.parse.quote(team), year))
         wp = urlopen(req)
         soup = BeautifulSoup(wp, 'html.parser')
         trList = soup.find("table", "table table-striped").find_all('tr')
-        #print(trList)
         trList.pop(0)
         totalpay = 0
         
@@ -108,14 +108,15 @@ for team, dictval in dataDef.items():
         obj.append(totalpay)
 
 
-#Attack WAR + Defence WAR
+#Data Processing(Attack WAR + Defence WAR)
 for Def, Att in zip(dataDef.items(), dataAtt.items()):
     for d_info,a_info in zip(Def[1],Att[1]):
         dataTot[Def[0]].append([d_info[0], d_info[1]+a_info[1], d_info[2]])
 
 
+#Data Processing(Pay / Total WAR) and Store myTeamName Information
 for team, year_arr in dataTot.items():
-    if team == '키움':
+    if team == '키움': #키움 has no information about pay
         continue
     
     for year, war, price in year_arr:
@@ -130,8 +131,5 @@ for team, year_arr in dataTot.items():
         if team == my_team_name:
             my_data[year] = eff
 
-            
-#print(max_data)
-#print(min_data)
-#print(my_data)
+
 drawGraph()
