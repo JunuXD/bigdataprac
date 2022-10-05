@@ -24,6 +24,22 @@ print("Input Your favorite TeamName : ",end = "")
 my_team_name = input()
 
 
+def check_name(name):
+    if name == '한화':
+        return 'HANHWA'
+    elif name == '넥센':
+        return 'NEXEN'
+    elif name == '삼성':
+        return 'SAMSUNG'
+    elif name == '두산':
+        return 'DOOSAN'
+    elif name == '롯데':
+        return 'LOTTE'
+    elif name == '히어로즈':
+        return 'HEROS'
+    else:
+        return name
+    
 def drawGraph():
     years = range(2013,2023)
     xAxis = list(range(2013,2023))
@@ -32,9 +48,11 @@ def drawGraph():
     highList = list(max_data.values())
     lowList = list(min_data.values())
     myList = list(my_data.values())
+
+    name = check_name(my_team_name)
     p.plot (xAxis, highList,    'r', label = 'high')
     p.plot (xAxis, lowList,  'b', label = 'low')     
-    p.plot (myAxis, myList, 'g', label = my_team_name)    
+    p.plot (myAxis, myList, 'g', label = name)    
     
     p.xlabel ('Year')
     p.ylabel ('Team Efficiency')
@@ -113,7 +131,7 @@ for team, year_arr in dataTot.items():
             my_data[year] = eff
 
             
-print(max_data)
-print(min_data)
-print(my_data)
+#print(max_data)
+#print(min_data)
+#print(my_data)
 drawGraph()
